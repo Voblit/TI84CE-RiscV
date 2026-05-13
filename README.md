@@ -1,2 +1,39 @@
 # TI84-Evo-RiscV
-Yes guys, yes I did not forget :P
+An online TI84Evo Simulator (well, really, just a reskinned CE) That supports RiscV instructions...
+
+
+
+
+
+
+
+
+
+
+
+That's all.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Yes I actually did it.
