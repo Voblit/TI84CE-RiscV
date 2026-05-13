@@ -1,0 +1,101 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>CE-V</title>
+    <meta name="description" content="Voblits cool thingy i made :P">
+    <meta name="theme-color" content="#ffffff">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="tn.css"/>
+
+    <style>
+      body {
+        padding: 0px !important;
+        display: flex !important;
+        flex-direction: column;
+      }
+      .calculatorDiv {
+        outline: none !important;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      #main_div {
+        padding: 4px;
+        max-width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+    </style>
+
+
+
+
+
+    <script src="/Simulator.js"></script>
+    <script id="h84statej" type="application/json" data-url="/calcstate.h84statej"></script>
+    <script id="ti84faceplate" type="application/json" data-url="https://mn.testnav.com/client/texasinstruments/images/TI84CE_touch.svg"></script>
+  </head>
+  <body>
+    <div id="calculatorDiv"></div>
+    <div id="main_div">
+    </div>
+
+    <script>
+      const from_id = (id) => document.getElementById(id);
+      const h84statej = from_id("h84statej");
+      const ti84faceplate = from_id("ti84faceplate");
+      const calc_div = from_id("calculatorDiv");
+      const main_div = from_id("main_div");
+
+      //proxy the xmlhttprequest open to remove the hash from the url
+      XMLHttpRequest.prototype.open = new Proxy(XMLHttpRequest.prototype.open, {
+        apply: function (target, thisArg, args) {
+          if (typeof args[1] === "string") {
+            args[1] = args[1].replace(/#.*$/, "");
+          }
+          Reflect.apply(target, thisArg, args);
+        },
+      })
+
+      function create_blob(string) {
+        if (!string) return null;
+        let blob = new Blob([JSON.parse(string)]);
+        return URL.createObjectURL(blob);
+      }
+
+      function open_popup() {
+        let width = window.getComputedStyle(calc_div)["width"].replace("px", "");
+        let height = window.getComputedStyle(calc_div)["height"].replace("px", "");
+        let new_url = new URL(location.href);
+        new_url.hash = "popup";
+        window.open(new_url.href, null, `height=${height}, width=${width}`);
+      }
+
+      function main() {
+        if (location.hash === "#popup" || location.protocol == "file:"){
+          main_div.style.display = "none";
+        }
+
+        let default_rom = h84statej.getAttribute("data-url");
+        let default_faceplate = ti84faceplate.getAttribute("data-url");
+
+        let rom_url = create_blob(h84statej.innerHTML) || default_rom;
+        let faceplate_url = create_blob(ti84faceplate.innerHTML) || default_faceplate;
+        
+        rom_url += "#.h84statej";
+        faceplate_url += "#.svg";
+        let ti84 = new TI84PCE({ROMLocation: rom_url, FaceplateLocation: faceplate_url});
+      }
+
+      main();
+    </script>
+
+
+  </body>
+</html>
+
