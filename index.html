@@ -56,11 +56,7 @@
     let deferredPrompt;
     const installBtn = document.getElementById('install-btn');
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        installBtn.style.display = 'block'; // Show the button
-    });
+    
 
     installBtn.addEventListener('click', async () => {
         if (deferredPrompt) {
