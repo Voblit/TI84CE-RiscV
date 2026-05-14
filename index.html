@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -30,11 +28,11 @@
         flex-direction: column;
         gap: 4px;
       }
+      /* pey */
+      #install-btn {
+        display: none;
+      }
     </style>
-
-
-
-
 
     <script src="/Simulator.js"></script>
     <script id="h84statej" type="application/json" data-url="/calcstate.h84statej"></script>
@@ -42,33 +40,54 @@
   </head>
   <body>
     <div id="calculatorDiv"></div>
-    <div id="main_div">
-      
-    </div>
-<button id="install-btn">Install me daddy UwU</button>
-    <script>
-    // Register the Service Worker (Must be a real file!)
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
-    }
+    <div id="main_div"></div>
+    
+    <button id="install-btn">Install pwa</button>
 
-    // Logic to handle the Install Prompt
+    <script>
     let deferredPrompt;
     const installBtn = document.getElementById('install-btn');
 
     
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+    }
 
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        
+        e.preventDefault();
+ 
+        deferredPrompt = e;
+        
+        installBtn.style.display = 'block';
+    });
+
+    
     installBtn.addEventListener('click', async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                installBtn.style.display = 'none';
-            }
-            deferredPrompt = null;
+        if (!deferredPrompt) return;
+        
+
+        deferredPrompt.prompt();
+        
+
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            console.log('User accepted the install prompt');
         }
+        
+
+        deferredPrompt = null;
+        installBtn.style.display = 'none';
+    });
+
+    
+    window.addEventListener('appinstalled', () => {
+        deferredPrompt = null;
+        installBtn.style.display = 'none';
     });
     </script>
+
     <script>
       const from_id = (id) => document.getElementById(id);
       const h84statej = from_id("h84statej");
@@ -76,7 +95,6 @@
       const calc_div = from_id("calculatorDiv");
       const main_div = from_id("main_div");
 
-      //proxy the xmlhttprequest open to remove the hash from the url
       XMLHttpRequest.prototype.open = new Proxy(XMLHttpRequest.prototype.open, {
         apply: function (target, thisArg, args) {
           if (typeof args[1] === "string") {
@@ -88,16 +106,12 @@
 
       function create_blob(string) {
         if (!string) return null;
-        let blob = new Blob([JSON.parse(string)]);
-        return URL.createObjectURL(blob);
-      }
-
-      function open_popup() {
-        let width = window.getComputedStyle(calc_div)["width"].replace("px", "");
-        let height = window.getComputedStyle(calc_div)["height"].replace("px", "");
-        let new_url = new URL(location.href);
-        new_url.hash = "popup";
-        window.open(new_url.href, null, `height=${height}, width=${width}`);
+        try {
+          let blob = new Blob([JSON.parse(string)]);
+          return URL.createObjectURL(blob);
+        } catch(e) {
+          return null;
+        }
       }
 
       function main() {
@@ -113,13 +127,15 @@
         
         rom_url += "#.h84statej";
         faceplate_url += "#.svg";
-        let ti84 = new TI84PCE({ROMLocation: rom_url, FaceplateLocation: faceplate_url});
+        
+        let ti84 = new TI84PCE({
+          container: calc_div,
+          ROMLocation: rom_url, 
+          FaceplateLocation: faceplate_url
+        });
       }
 
       main();
     </script>
-
-
   </body>
 </html>
-
