@@ -1,5 +1,5 @@
-# TI84-Evo-RiscV
-An online TI84Evo Simulator (well, really, just a reskinned CE) That supports RiscV instructions...
+# TI84-RiscV(oblit
+An online TI84+CE simulator That supports RiscV instructions...
 
 
 
